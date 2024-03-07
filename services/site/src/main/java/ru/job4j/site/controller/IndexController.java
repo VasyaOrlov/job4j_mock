@@ -12,10 +12,7 @@ import ru.job4j.site.service.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.job4j.site.controller.RequestResponseTools.getToken;
@@ -50,12 +47,11 @@ public class IndexController {
         }
         List<InterviewDTO> interviews = interviewsService.getByType(1);
         model.addAttribute("new_interviews", interviews);
-        List<ProfileDTO> profiles = interviews.stream()
-                .map(e -> profilesService.getProfileById(e.getSubmitterId()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .distinct()
-                .toList();
+        Set<ProfileDTO> profiles = interviews.stream()
+                .flatMap(interview -> profilesService.getAllProfile()
+                        .stream()
+                        .filter(profile -> profile.getId() == interview.getSubmitterId()))
+                .collect(Collectors.toSet());
         model.addAttribute("profiles", profiles);
         return "index";
     }
