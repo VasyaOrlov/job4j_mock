@@ -105,11 +105,13 @@
                                     <span class="fw-bold" th:text="${category.total}"></span>
                                     <span class="mr-3">Тем : </span>
                                     <span class="fw-bold" th:text="${category.topicsSize}"></span>
-                                    </span>
                                 </small>
                             </td>
                             <td>
-                                <span class="badge bg-success">Новых: 100</span>
+                                <span class="badge bg-success"
+                                      th:text="|Новых ${value_interview.get(category.getId()) == null ?
+                                      '0' : value_interview.get(category.getId())}|">
+                                </span>
                             </td>
                         </tr>
                         </tbody>
