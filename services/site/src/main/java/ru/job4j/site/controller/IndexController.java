@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import ru.job4j.site.dto.CategoryDTO;
 import ru.job4j.site.dto.InterviewDTO;
 import ru.job4j.site.dto.ProfileDTO;
-import ru.job4j.site.dto.TopicDTO;
 import ru.job4j.site.service.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,17 +55,17 @@ public class IndexController {
                         .filter(profile -> profile.getId() == interview.getSubmitterId()))
                 .collect(Collectors.toSet());
         model.addAttribute("profiles", profiles);
-        List<TopicDTO> topics = new ArrayList<>();
+        HashMap<Integer, Integer> topicCategory = new HashMap<>();
         for (CategoryDTO category : categories) {
-            topics.addAll(topicsService.getByCategory(category.getId()));
+            int idCategory = category.getId();
+            topicsService.getByCategory(idCategory)
+                            .forEach(e -> topicCategory.put(e.getId(), idCategory));
         }
         HashMap<Integer, Integer> valueInterview = new HashMap<>();
         for (InterviewDTO interview : interviews) {
-            for (TopicDTO topic : topics) {
-                if (topic.getId() == interview.getTopicId()) {
-                    int key = topic.getCategory().getId();
-                    valueInterview.put(key, valueInterview.getOrDefault(key, 0) + 1);
-                }
+            Integer idCategory = topicCategory.get(interview.getTopicId());
+            if (idCategory != null) {
+                valueInterview.put(idCategory, valueInterview.getOrDefault(idCategory, 0) + 1);
             }
         }
         model.addAttribute("value_interview", valueInterview);
