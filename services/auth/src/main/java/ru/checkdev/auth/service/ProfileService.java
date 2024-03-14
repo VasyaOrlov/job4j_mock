@@ -3,11 +3,14 @@ package ru.checkdev.auth.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.dto.ProfileDTO;
 import ru.checkdev.auth.repository.PersonRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * CheckDev пробное собеседование
@@ -40,5 +43,9 @@ public class ProfileService {
      */
     public List<ProfileDTO> findProfilesOrderByCreatedDesc() {
         return personRepository.findProfileOrderByCreatedDesc();
+    }
+
+    public List<ProfileDTO> findProfilesByIdsSubmitterInterview(Set<Integer> ids) {
+        return personRepository.findProfilesByIds(ids);
     }
 }

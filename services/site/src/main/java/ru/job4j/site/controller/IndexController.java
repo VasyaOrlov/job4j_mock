@@ -54,7 +54,7 @@ public class IndexController {
                         .stream()
                         .filter(profile -> profile.getId() == interview.getSubmitterId()))
                 .collect(Collectors.toSet());
-        model.addAttribute("profiles", profiles);
+        model.addAttribute("profiles", profilesService.getProfilesByInterview(interviews));
         HashMap<Integer, Integer> topicCategory = new HashMap<>();
         for (CategoryDTO category : categories) {
             int idCategory = category.getId();

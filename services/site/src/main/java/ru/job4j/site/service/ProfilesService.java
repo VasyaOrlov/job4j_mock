@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.job4j.site.dto.InterviewDTO;
 import ru.job4j.site.dto.ProfileDTO;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * CheckDev пробное собеседование
@@ -22,6 +25,7 @@ import java.util.Optional;
 @Slf4j
 public class ProfilesService {
     private static final String URL_PROFILES = "/profiles/";
+    private static final String URL_PROFILES_BY_INTERVIEW = "/profiles/byInterview/";
     private final WebClientAuthCall webClientAuthCall;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,6 +51,16 @@ public class ProfilesService {
     public List<ProfileDTO> getAllProfile() {
         var responseEntity = webClientAuthCall
                 .doGetReqParamAll(URL_PROFILES)
+                .block();
+        return responseEntity.getBody();
+    }
+
+    public List<ProfileDTO> getProfilesByInterview(List<InterviewDTO> interviews) {
+        Set<Integer> ids = interviews.stream()
+                .map(InterviewDTO::getSubmitterId)
+                .collect(Collectors.toSet());
+        var responseEntity = webClientAuthCall
+                .doGetReqParamUrlAndInterview(URL_PROFILES_BY_INTERVIEW, ids)
                 .block();
         return responseEntity.getBody();
     }

@@ -11,6 +11,7 @@ import ru.checkdev.auth.domain.Photo;
 import ru.checkdev.auth.dto.ProfileDTO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author parsentev
@@ -72,4 +73,7 @@ public interface PersonRepository extends CrudRepository<Profile, Integer> {
      */
     @Query("SELECT new ru.checkdev.auth.dto.ProfileDTO(p.id, p.username, p.experience, p.photo.id, p.updated, p.created) FROM profile p ORDER BY p.created DESC")
     List<ProfileDTO> findProfileOrderByCreatedDesc();
+
+    @Query("SELECT new ru.checkdev.auth.dto.ProfileDTO(p.id, p.username, p.experience, p.photo.id, p.updated, p.created) FROM profile p WHERE p.id in :ids")
+    List<ProfileDTO> findProfilesByIds(@Param("ids") Set<Integer> ids);
 }

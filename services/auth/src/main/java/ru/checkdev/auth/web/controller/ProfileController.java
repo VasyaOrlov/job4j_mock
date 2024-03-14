@@ -3,14 +3,13 @@ package ru.checkdev.auth.web.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.checkdev.auth.dto.ProfileDTO;
 import ru.checkdev.auth.service.ProfileService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * CheckDev пробное собеседование
@@ -51,6 +50,19 @@ public class ProfileController {
     @GetMapping("/")
     public ResponseEntity<List<ProfileDTO>> getAllProfilesOrderByCreateDesc() {
         var profiles = profileService.findProfilesOrderByCreatedDesc();
+        return new ResponseEntity<>(
+                profiles,
+                profiles.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/byInterview/", consumes = "application/json")
+    public ResponseEntity<List<ProfileDTO>> getProfilesByIdsSubmitterInterview(@RequestBody(required = false)
+                                                                               Set<Integer> ids) {
+        System.out.println(ids);
+        List<ProfileDTO> profiles = new ArrayList<>();
+        if (!ids.isEmpty()) {
+            profiles = profileService.findProfilesByIdsSubmitterInterview(ids);
+        }
         return new ResponseEntity<>(
                 profiles,
                 profiles.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);

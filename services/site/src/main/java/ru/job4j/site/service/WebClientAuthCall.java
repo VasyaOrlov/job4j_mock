@@ -2,6 +2,7 @@ package ru.job4j.site.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import ru.job4j.site.dto.InterviewDTO;
 import ru.job4j.site.dto.ProfileDTO;
 
+import java.nio.channels.MembershipKey;
 import java.util.List;
+import java.util.Set;
 
 /**
  * CheckDev пробное собеседование
@@ -119,5 +123,16 @@ public class WebClientAuthCall {
                 .retrieve()
                 .toEntity(ByteArrayResource.class)
                 .doOnError(err -> log.error("API {} not found: {}", url, id));
+    }
+
+    public Mono<ResponseEntity<List<ProfileDTO>>> doGetReqParamUrlAndInterview(String urlProfilesByInterview,
+                                                                               Set<Integer> ids) {
+        return webClient
+                .post()
+                .uri(urlProfilesByInterview)
+                .bodyValue(ids)
+                .retrieve()
+                .toEntityList(ProfileDTO.class)
+                .doOnError(err -> log.error("API {} not found: {}", urlProfilesByInterview, err.getMessage()));
     }
 }
