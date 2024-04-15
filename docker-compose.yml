@@ -17,6 +17,10 @@ services:
     build:
       context: ./services/auth
       dockerfile: Dockerfile
+    environment:
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://auth:9000/user
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth_db:5432/cd_auth
+      - SERVER_NOTIFICATION=http://notification:9920
     ports:
       - "9900:9900"
     depends_on:
@@ -39,6 +43,10 @@ services:
     build:
       context: ./services/desc
       dockerfile: Dockerfile
+    environment:
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://auth:9000/user
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://desc_db:5432/cd_desc
+      - SERVER_NOTIFICATION=http://notification:9920
     ports:
       - "9902:9902"
     depends_on:
@@ -61,6 +69,10 @@ services:
     build:
       context: ./services/mock
       dockerfile: Dockerfile
+    environment:
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://auth:9000/user
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mock_db:5432/mock
+      - SERVER_NOTIFICATION=http://notification:9920
     ports:
       - "9912:9912"
     depends_on:
@@ -83,6 +95,16 @@ services:
     build:
       context: ./services/notification
       dockerfile: Dockerfile
+    environment:
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://auth:9000/user
+      - SECURITY_OAUTH2_TOKENURI=http://auth:9900/oauth/token
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification_db:5432/cd_notification
+      - SERVER_SITE_URL_LOGIN=http://site:8080/login
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS=kafka:9092
+      - SERVER_AUTH=http://auth:9900
+      - SERVICE_DESC=http://desc:9902
+      - SERVICE_MOCK=http://mock:9912
+      - SERVICE_NOTIFICATION=http://notification:9920
     ports:
       - "9920:9920"
     depends_on:
@@ -93,6 +115,14 @@ services:
     build:
       context: ./services/site
       dockerfile: Dockerfile
+    environment:
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://auth:9900/user
+      - SECURITY_OAUTH2_TOKENURI=http://auth:9900/oauth/token
+      - SERVER_AUTH=http://auth:9900
+      - SERVER_AUTH_PING=http://auth:9900/ping
+      - SERVICE_MOCK=http://mock:9912
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS=kafka:9092
+      - SERVER_SITE_URL=http://site:8080/
     ports:
       - "8080:8080"
     depends_on:

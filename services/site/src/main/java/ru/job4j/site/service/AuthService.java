@@ -12,6 +12,9 @@ import java.util.Map;
 @Service
 @Slf4j
 public class AuthService {
+    @Value("${server.auth}")
+    private String authUrl;
+
     @Value("${security.oauth2.resource.userInfoUri}")
     private String oauth2Url;
 
@@ -23,7 +26,7 @@ public class AuthService {
     public UserInfoDTO userInfo(String token) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(new RestAuthCall(
-                "http://localhost:9900/person/current"
+                String.format("%s/person/current", authUrl)
         ).get(token), UserInfoDTO.class);
     }
 

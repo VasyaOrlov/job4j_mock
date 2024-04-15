@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.job4j.site.dto.SubscribeCategory;
@@ -14,9 +17,11 @@ import ru.job4j.site.dto.UserTopicDTO;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class NotificationService {
-
+    @Value("${service.notification}")
+    private String notificationUrl;
+    @NonNull
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     public void addSubscribeCategory(int userId, int categoryId) {
@@ -30,7 +35,7 @@ public class NotificationService {
     }
 
     public UserDTO findCategoriesByUserId(int id) throws JsonProcessingException {
-        var text = new RestAuthCall("http://localhost:9920/subscribeCategory/" + id).get();
+        var text = new RestAuthCall(String.format("%s/subscribeCategory/%d", notificationUrl, id)).get();
         var mapper = new ObjectMapper();
         List<Integer> list = mapper.readValue(text, new TypeReference<>() {
         });
@@ -48,7 +53,7 @@ public class NotificationService {
     }
 
     public UserTopicDTO findTopicByUserId(int id) throws JsonProcessingException {
-        var text = new RestAuthCall("http://localhost:9920/subscribeTopic/" + id).get();
+        var text = new RestAuthCall(String.format("%s/subscribeTopic/%d", notificationUrl, id)).get();
         var mapper = new ObjectMapper();
         List<Integer> list = mapper.readValue(text, new TypeReference<>() {
         });
