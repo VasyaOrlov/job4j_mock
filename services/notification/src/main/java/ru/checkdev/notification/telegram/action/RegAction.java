@@ -7,7 +7,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.checkdev.notification.domain.PersonDTO;
 import ru.checkdev.notification.telegram.config.TgConfig;
+import ru.checkdev.notification.telegram.domain.TgUser;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
+import ru.checkdev.notification.telegram.service.TgUserService;
 
 import java.util.Calendar;
 
@@ -25,13 +27,20 @@ public class RegAction implements Action {
     private static final String URL_AUTH_REGISTRATION = "/registration";
     private final TgConfig tgConfig = new TgConfig("tg/", 8);
     private final TgAuthCallWebClint authCallWebClint;
+    private final TgUserService tgUserService;
     private final String urlSiteAuth;
 
     @Override
     public BotApiMethod<Message> handle(Message message) {
-        var chatId = message.getChatId().toString();
-        var text = "Введите email для регистрации:";
-        return new SendMessage(chatId, text);
+        var chatId = message.getChatId();
+        String text;
+        if (tgUserService.checkExist(chatId)) {
+            text = "Вы уже зарегистрированы" + System.lineSeparator()
+                    + "Получить данные о пользователе: /check";
+        } else {
+            text = "Введите email для регистрации:";
+        }
+        return new SendMessage(String.valueOf(chatId), text);
     }
 
     /**
@@ -50,25 +59,26 @@ public class RegAction implements Action {
     public BotApiMethod<Message> callback(Message message) {
         var chatId = message.getChatId().toString();
         var email = message.getText();
+        var username = message.getFrom().getUserName();
         var text = "";
-        var sl = System.lineSeparator();
+        var ls = System.lineSeparator();
 
         if (!tgConfig.isEmail(email)) {
-            text = "Email: " + email + " не корректный." + sl
-                   + "попробуйте снова." + sl
+            text = "Email: " + email + " не корректный." + ls
+                   + "попробуйте снова." + ls
                    + "/new";
             return new SendMessage(chatId, text);
         }
 
         var password = tgConfig.getPassword();
-        var person = new PersonDTO(email, password, true, null,
+        var person = new PersonDTO(username, email, password, true, null,
                 Calendar.getInstance());
         Object result;
         try {
             result = authCallWebClint.doPost(URL_AUTH_REGISTRATION, person).block();
         } catch (Exception e) {
             log.error("WebClient doPost error: {}", e.getMessage());
-            text = "Сервис не доступен попробуйте позже" + sl
+            text = "Сервис не доступен попробуйте позже" + ls
                    + "/start";
             return new SendMessage(chatId, text);
         }
@@ -80,9 +90,14 @@ public class RegAction implements Action {
             return new SendMessage(chatId, text);
         }
 
-        text = "Вы зарегистрированы: " + sl
-               + "Логин: " + email + sl
-               + "Пароль: " + password + sl
+        Object personObject = mapObject.get("person");
+        var personData = tgConfig.getObjectToMap(personObject);
+        TgUser tgUser = new TgUser(0, username, email, message.getChatId(),
+                (int) personData.get("id"));
+        tgUserService.save(tgUser);
+        text = "Вы зарегистрированы: " + ls
+               + "Логин: " + email + ls
+               + "Пароль: " + password + ls
                + urlSiteAuth;
         return new SendMessage(chatId, text);
     }

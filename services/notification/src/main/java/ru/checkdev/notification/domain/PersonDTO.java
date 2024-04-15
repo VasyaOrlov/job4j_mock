@@ -2,6 +2,7 @@ package ru.checkdev.notification.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Calendar;
 import java.util.List;
@@ -14,7 +15,9 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PersonDTO {
+    private String userName;
     private String email;
     private String password;
     private boolean privacy;
