@@ -1,6 +1,6 @@
 # CheckDev - пробные собеседования в IT
 
-# Описание проекта
+## Описание проекта
 
 CheckDev - это платформа для проведения пробных собеседований. 
 Пользователем отображается список актуальных собеседований с их темой.
@@ -21,8 +21,30 @@ notification - сервис используются для уведомлени
 
 site - UI отображаение сайта.
 
-# Запуск проекта:
+## Стек технологий
+* Spring Boot
+* * Web
+* * Data JPA
+* * Security
+* * Thymeleaf
+* * Kafka
+* * RestTemplate
+* * WebClient
+* * Test
+* PostgreSQL
+* Bootstrap
+* Liquibase
+* Hibernate
+* H2
+* Lombok
+* Log4J
+* Checkstyle
+* Telegrambots
 
+## Окружение
+Java 17, Maven 3.8, PostgreSQL 14, Hibernat-Core 5.6.11, H2 2.1.214.
+
+## Запуск проекта:
 1. Установить Docker/Docker-compose
 2. Клонировать проект
 3. Запустить терминал в корне проекта и выполнить команду: docker-compose build
